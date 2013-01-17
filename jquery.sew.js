@@ -17,7 +17,9 @@
 			elementFactory: elementFactory,
 			values: [],
 			unique: false,
-			repeat: true
+			repeat: true,
+			includeToken: true,
+			replacementString: undefined
 		};
 
 	function Plugin(element, options) {
@@ -90,11 +92,21 @@
 
 	Plugin.prototype.replace = function (replacement) {
 		var startpos = this.$element.getCursorPosition();
-		var separator = startpos === 1 ? '' : ' ';
+		// Subtract this.matchLength from startpos to determine if this is at the beginning of the input field.
+		var separator = (startpos - this.matchLength == 0) ? '' : ' ';
 
 		var fullStuff = this.getText();
 		var val = fullStuff.substring(0, startpos);
-		val = val.replace(this.expression, separator + this.options.token + replacement);
+
+		// Don't include the token if requested
+		replacement = (this.options.includeToken ? val + replacement : replacement);
+
+		// Allow users to customize the replacement pattern. Useful for wrapping selected values with markup.
+		if (this.options.replacementString) {
+  		var regexp = new RegExp("(" + replacement + ")")
+		  replacement = replacement.replace(regexp, this.options.replacementString);
+		}
+		val = val.replace(this.expression, separator + replacement);
 
 		var posfix = fullStuff.substring(startpos, fullStuff.length);
 		var separator2 = posfix.match(/^\s/) ? '' : ' ';
@@ -218,6 +230,12 @@
 			this.displayList();
 			this.lastFilter = "\n";
 			this.matched = true;
+		}
+
+		// Matches may be more than one character long.
+		// Set match length so that we can figure out the starting position later
+		if (matches) {
+			this.matchLength = matches[0].length;
 		}
 
 		if(matches && !this.dontFilter) {
