@@ -27,15 +27,6 @@
 				<script type="text/javascript" src="../jquery.sew.js"></script>
 		<script>
 			$(document).ready(function() {
-				var values = [{val:'santiagotactivos', meta:'Santiago Montero'},
-							  {val:'johnnyhalife', meta:'Johnny Halife'},
-							  {val:'arielflesler', meta:'Ariel Flesler'},
-							  {val:'rbajales', meta:'Raul Bajales'}];
-
-				for (var i = 0; i < 10; i++) {
-					values.push({val: 'johnnyhalife' + i})
-				};
-
 
 				var customItemTemplate = "<div><span />&nbsp;<small /></div>";
 
@@ -47,9 +38,24 @@
 					element.append(template);
 				};
 
-				// here is how we use it
-				$('textarea').sew({values: values, elementFactory: elementFactory});
+				var values = [
+				  {val: "BIOL 1001", meta: "Intro to Biology"},
+				  {val: "MATH 1001", meta: "Intro to Math"}
+				];
 
+				var token = "(BIOL|MATH)(\\s\\d{0,4}?)?";
+
+				// here is how we use it
+				$('textarea').sew({values: values, elementFactory: elementFactory, token: token, includeToken: false, replacementString: "[$1]"});
+
+				values = [{val:'santiagotactivos', meta:'Santiago Montero'},
+							  {val:'johnnyhalife', meta:'Johnny Halife'},
+							  {val:'arielflesler', meta:'Ariel Flesler'},
+							  {val:'rbajales', meta:'Raul Bajales'}];
+
+				for (var i = 0; i < 10; i++) {
+					values.push({val: 'johnnyhalife' + i})
+				};
 
 				// with repetition but unique flag
 				var repeatedElements = [{val: 'johnny'}, {val: 'chanta'}, {val: 'chanta'}, {val: 'chanta'}];
