@@ -4,7 +4,7 @@
  * @license under GNU license
  * @author Bevis Zhao (i@bevis.me, http://bevis.me)
  */
-$(function() {
+(function ($) {
 
 	var calculator = {
 		// key styles
@@ -170,4 +170,4 @@ $(function() {
 	  },
 		getCaretPosition: calculator.getCaretPosition
 	});
-});
+})(jQuery);

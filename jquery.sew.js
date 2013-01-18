@@ -33,7 +33,7 @@
 		this._defaults = defaults;
 		this._name = pluginName;
 
-		this.expression = new RegExp('(?:^|\\b|\\s)' + this.options.token + '([\\w.]*)$');
+		this.expression = new RegExp('(?:^|\\b|\\s)' + this.options.token + '([\\w.]*)$', 'i');
 		this.cleanupHandle = null;
 
 		this.init();
@@ -46,7 +46,7 @@
 	Plugin.KEYS = [40, 38, 13, 27, 9];
 
 	Plugin.prototype.init = function () {
-		if(this.options.values.length < 1) return;
+//		if(this.options.values.length < 1) return;
 
 		this.$element
 									.bind('keyup', this.onKeyUp.bind(this))
@@ -162,30 +162,47 @@
 	};
 
 	Plugin.prototype.filterList = function (val) {
+
 		if(val == this.lastFilter) return;
 
 		this.lastFilter = val;
 		this.$itemList.find(".-sew-list-item").remove();
-		var values = this.options.values;
 
+		var self = this;
 
-		var vals = this.filtered = values.filter(function (e) {
-			var exp = new RegExp('\\W*' + this.options.token + e.val + '(\\W|$)');
-			if(!this.options.repeat && this.getText().match(exp)) {
-				return false;
-			}
+	  function filterList (values) {
 
-			return	val === "" ||
-							e.val.toLowerCase().indexOf(val.toLowerCase()) >= 0 ||
-							(e.meta || "").toLowerCase().indexOf(val.toLowerCase()) >= 0;
-		}.bind(this));
+  		var vals = self.filtered = values.filter(function (e) {
+  			var exp = new RegExp('\\W*' + self.options.token + e.val + '(\\W|$)');
+  			if(!self.options.repeat && self.getText().match(exp)) {
+  				return false;
+  			}
+  			console.log(e);
 
-		if(vals.length) {
-			this.renderElements(vals);
-			this.$itemList.show();
-		} else {
-			this.hideList();
-		}
+  			return	val === "" ||
+  							e.val.toLowerCase().indexOf(val.toLowerCase()) >= 0 ||
+  							(e.meta || "").toLowerCase().indexOf(val.toLowerCase()) >= 0;
+  		}.bind(self));
+
+  		if(vals.length) {
+  			self.renderElements(vals);
+  			self.$itemList.show();
+  		} else {
+  			self.hideList();
+  		}
+
+	  }
+
+  	if (this.options.search) {
+  	 console.log(this.options.search);
+  	   $.get(this.options.search, {s: val}, function (response) {
+  	     filterList(response);
+  	   }, 'json');
+  	}
+  	else {
+  		filterList(this.options.values);
+  	}
+
 	};
 
 	Plugin.getUniqueElements = function (elements) {
